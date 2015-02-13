@@ -18,22 +18,31 @@ Usage
 
     func main() {
 
+    	// create our CLI App
         cli := piper.CLIApp{
             Name:        "pipedream",
             Description: "dreamily pipes data through your tasks",
         }
 
+        // configure it to accept a global flag that will be visible to all tasks
         cli.Flags = append(cli.Flags, piper.Flag{
             Name:        "verbose",
             Symbol:      "v",
             Description: "Verbose mode",
         })
 
+        // Configure some tasks. Each task must have a name, and a Task configured.
+        // The Description is for the sake of help generation, and a number of
+        // mandatory positional arguments may also be requested.
+        // The task should return a reference to a datastructure which the next
+        // task in the pipeline will recieve.
+
         cli.Commands = append(cli.Commands, piper.Command{
             Name:        "start",
             Description: "takes two words",
             Args:        []string{"first word", "second word"},
             Task: func(data *interface{}, flags map[string]piper.Flag, args []string) *interface{} {
+                // Check for global flags like so
                 if _, verbose := flags["verbose"]; verbose {
                     fmt.Println(" - creating some data for the pipeline with those two words")
                 }
@@ -45,7 +54,6 @@ Usage
         cli.Commands = append(cli.Commands, piper.Command{
             Name:        "reverse",
             Description: "reverse all the words",
-            Args:        []string{},
             Task: func(data *interface{}, flags map[string]piper.Flag, args []string) *interface{} {
                 deref := *data
                 words := deref.([]string)
@@ -83,8 +91,10 @@ Usage
             },
         })
 
+        // Make it run
         err := cli.Run()
 
+        // Be nice to the user when they screw up
         if err != nil {
             fmt.Println(err)
             cli.PrintHelp()
