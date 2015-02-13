@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type Task func(*interface{}, map[string]Flag, []string)
+type Task func(*interface{}, map[string]Flag, []string) *interface{}
 
 type Flag struct {
 	Name        string
@@ -74,7 +74,7 @@ func (c *CLIApp) PrintHelp() {
 // Once the arguments have been interpreted it executes the pipline.
 func (c *CLIApp) Run() (err error) {
 	flags := make(map[string]Flag)
-	pipeline := make([]func(*interface{}), 0)
+	pipeline := make([]func(*interface{}) *interface{}, 0)
 	i := 1
 	for i < len(os.Args) {
 		var read int
@@ -100,8 +100,9 @@ func (c *CLIApp) Run() (err error) {
 							return
 						}
 						task_args := args[1 : len(t.Args)+1]
-						pipeline = append(pipeline, func(data *interface{}) {
-							t.Task(data, flags, task_args)
+						pipeline = append(pipeline, func(data *interface{}) *interface{} {
+							data = t.Task(data, flags, task_args)
+							return data
 						})
 						read = len(t.Args) + 1
 						return
@@ -124,7 +125,7 @@ func (c *CLIApp) Run() (err error) {
 
 	var data *interface{}
 	for _, stage := range pipeline {
-		stage(data)
+		data = stage(data)
 	}
 	return
 }
