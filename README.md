@@ -31,7 +31,7 @@ Usage
             Description: "Verbose mode",
         })
 
-        // Configure some tasks. Each task must have a name, and a Task configured.
+        // Configure some commands. Each task must have a name, and a Task configured.
         // The Description is for the sake of help generation, and a number of
         // mandatory positional arguments may also be requested.
         // The task should return a reference to a datastructure which the next
