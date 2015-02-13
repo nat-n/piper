@@ -39,18 +39,19 @@ func (c *CLIApp) PrintHelp() {
 	fmt.Println(
 		"   "+c.Name+" [global options] ",
 		"[command [command options] [arguments...] ...]")
+	fmt.Print("\n")
 	if len(c.Flags) > 0 {
 		fmt.Println("Global options:")
 		for _, f := range c.Flags {
-			fmt.Print("   --" + f.Name)
 			if len(f.Symbol) > 0 {
-				fmt.Print(", -" + f.Symbol)
+				fmt.Print("   -" + f.Symbol)
 			}
 			if len(f.Description) > 0 {
 				fmt.Print("  " + f.Description + "\n")
 			}
 		}
 	}
+	fmt.Print("\n")
 	if len(c.Commands) > 0 {
 		if len(c.Commands) > 0 {
 			fmt.Println("Commands:")
@@ -61,11 +62,13 @@ func (c *CLIApp) PrintHelp() {
 					for _, a := range s.Args[1:] {
 						fmt.Print(", " + a)
 					}
+					fmt.Print("\n")
 				}
+				fmt.Print("\n")
 			}
 		}
 	}
-	fmt.Print("\n\n* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n")
+	fmt.Print("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n")
 }
 
 // Parses command line arguments, constructing a pipeline of tasks from the

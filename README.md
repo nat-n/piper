@@ -1,0 +1,134 @@
+piper
+=====
+
+A simple and to the point CLI framework in go. The point being to allow
+pipelining of commands like I needed that one time. Also generates help.
+
+Usage
+=====
+
+    package main
+
+    import (
+        "fmt"
+        "github.com/nat-n/piper"
+        "strconv"
+        str "string"
+    )
+
+    func main() {
+
+        cli := piper.CLIApp{
+            Name:        "pipedream",
+            Description: "dreamily pipes data through your tasks",
+        }
+
+        cli.Flags = append(cli.Flags, piper.Flag{
+            Name:        "verbose",
+            Symbol:      "v",
+            Description: "Verbose mode",
+        })
+
+        cli.Commands = append(cli.Commands, piper.Command{
+            Name:        "start",
+            Description: "takes two words",
+            Args:        []string{"first word", "second word"},
+            Task: func(data *interface{}, flags map[string]piper.Flag, args []string) *interface{} {
+                if _, verbose := flags["verbose"]; verbose {
+                    fmt.Println(" - creating some data for the pipeline with those two words")
+                }
+                new_data := (interface{})(args)
+                return &new_data
+            },
+        })
+
+        cli.Commands = append(cli.Commands, piper.Command{
+            Name:        "reverse",
+            Description: "reverse all the words",
+            Args:        []string{},
+            Task: func(data *interface{}, flags map[string]piper.Flag, args []string) *interface{} {
+                deref := *data
+                words := deref.([]string)
+                if _, verbose := flags["verbose"]; verbose {
+                    fmt.Println(" - reversing those words")
+                }
+                for i, word := range words {
+                    words[i] = str.Reverse(word)
+                }
+                return data
+            },
+        })
+
+        cli.Commands = append(cli.Commands, piper.Command{
+            Name:        "print",
+            Description: "print whatever is in the pipeline",
+            Args:        []string{"times"},
+            Task: func(data *interface{}, flags map[string]piper.Flag, args []string) *interface{} {
+                deref := *data
+                words := deref.([]string)
+                times, err := strconv.ParseInt(args[0], 0, 64)
+                if err != nil {
+                    fmt.Println("Error: invalid argument for print")
+                }
+                if _, verbose := flags["verbose"]; verbose {
+                    fmt.Println(" - gonna print the words now")
+                }
+                for i := 0; i < int(times); i++ {
+                    for _, word := range words {
+                        fmt.Print(word, " ")
+                    }
+                    fmt.Print("\n")
+                }
+                return data
+            },
+        })
+
+        err := cli.Run()
+
+        if err != nil {
+            fmt.Println(err)
+            cli.PrintHelp()
+        }
+    }
+
+And then:
+
+    $ pipedream -v  create Hello world!  reverse  print 3  reverse  print 1
+     - creating some data for the pipeline with those two words
+     - reversing those words
+     - gonna print the words now
+    olleH !dlrow
+    olleH !dlrow
+    olleH !dlrow
+     - reversing those words
+     - gonna print the words now
+    Hello world!
+
+    $ pipedream
+
+    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+    pipedream - dreamily pipes data through your tasks
+
+    Usage:
+       pipedream [global options]  [command [command options] [arguments...] ...]
+
+    Global options:
+       -v  Verbose mode
+
+    Commands:
+       start - takes two words
+         args: first word, second word
+
+       reverse - reverse all the words
+
+       print - print whatever is in the pipeline
+         args: times
+
+    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+License
+=======
+
+MIT. go nuts.
