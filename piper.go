@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type Task func(*interface{}, map[string]Flag, []string) *interface{}
@@ -80,6 +81,11 @@ func (c *CLIApp) Run() (err error) {
 	pipeline := make([]func(*interface{}) *interface{}, 0)
 	i := 1
 	for i < len(os.Args) {
+		// skip whitespace
+		if strings.TrimSpace(os.Args[i]) == "" {
+			i++
+			continue
+		}
 		var read int
 		read, err = func(args []string) (read int, err error) {
 			arg := args[0]
