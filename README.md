@@ -21,7 +21,7 @@ import (
 
 func main() {
 
-	// create our CLI App
+  // create our CLI App
   cli := piper.CLIApp{
     Name:        "pipedream",
     Description: "dreamily pipes data through your tasks",
