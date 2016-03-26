@@ -108,7 +108,7 @@ func main() {
 ### Invoking your command line interface:
 
 ```bash
-$ pipedream -v  create Hello world!  reverse  print 3  reverse  print 1
+$ pipedream -v  start Hello world!  reverse  print 3  reverse  print 1
  - creating some data for the pipeline with those two words
  - reversing those words
  - gonna print the words now
