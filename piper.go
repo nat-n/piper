@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-type Task func(*interface{}, map[string]Flag, []string) *interface{}
+type Task func(interface{}, map[string]Flag, []string) interface{}
 
 type Flag struct {
 	Name        string
@@ -72,13 +72,21 @@ func (c *CLIApp) PrintHelp() {
 	fmt.Print("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n")
 }
 
+func (c *CLIApp) RegisterCommand(cmd Command) {
+	c.Commands = append(c.Commands, cmd)
+}
+
+func (c *CLIApp) RegisterFlag(flag Flag) {
+	c.Flags = append(c.Flags, flag)
+}
+
 // Parses command line arguments, constructing a pipeline of tasks from the
 // subcommands along the way, returning an error if any issues are
 // encountered.
 // Once the arguments have been interpreted it executes the pipline.
 func (c *CLIApp) Run() (err error) {
 	flags := make(map[string]Flag)
-	pipeline := make([]func(*interface{}) *interface{}, 0)
+	pipeline := make([]func(interface{}) interface{}, 0)
 	i := 1
 	for i < len(os.Args) {
 		// skip whitespace
@@ -109,7 +117,7 @@ func (c *CLIApp) Run() (err error) {
 							return
 						}
 						task_args := args[1 : len(t.Args)+1]
-						pipeline = append(pipeline, func(data *interface{}) *interface{} {
+						pipeline = append(pipeline, func(data interface{}) interface{} {
 							data = t.Task(data, flags, task_args)
 							return data
 						})
@@ -132,7 +140,7 @@ func (c *CLIApp) Run() (err error) {
 		c.PrintHelp()
 	}
 
-	var data *interface{}
+	var data interface{}
 	for _, stage := range pipeline {
 		data = stage(data)
 	}

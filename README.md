@@ -28,7 +28,7 @@ func main() {
   }
 
   // configure it to accept a global flag that will be visible to all tasks
-  cli.Flags = append(cli.Flags, piper.Flag{
+  cli.RegisterFlag(piper.Flag{
     Name:        "verbose",
     Symbol:      "v",
     Description: "Verbose mode",
@@ -37,46 +37,44 @@ func main() {
   // Configure some commands. Each task must have a name, and a Task configured.
   // The Description is for the sake of help generation, and a number of
   // mandatory positional arguments may also be requested.
-  // The task should return a reference to a datastructure which the next
+  // The task should return a reference to a data structure which the next
   // task in the pipeline will recieve.
 
-  cli.Commands = append(cli.Commands, piper.Command{
+  cli.RegisterCommand(piper.Command{
     Name:        "start",
     Description: "takes two words",
     Args:        []string{"first word", "second word"},
-    Task: func(data *interface{}, flags map[string]piper.Flag, args []string) *interface{} {
+    Task: func(data interface{}, flags map[string]piper.Flag, args []string) interface{} {
       // Check for global flags like so
       if _, verbose := flags["verbose"]; verbose {
         fmt.Println(" - creating some data for the pipeline with those two words")
       }
       new_data := (interface{})(args)
-      return &new_data
+      return new_data
     },
   })
 
-  cli.Commands = append(cli.Commands, piper.Command{
+  cli.RegisterCommand(piper.Command{
     Name:        "reverse",
     Description: "reverse all the words",
-    Task: func(data *interface{}, flags map[string]piper.Flag, args []string) *interface{} {
-      deref := *data
-      words := deref.([]string)
+    Task: func(data interface{}, flags map[string]piper.Flag, args []string) interface{} {
+      words := data.([]string)
       if _, verbose := flags["verbose"]; verbose {
         fmt.Println(" - reversing those words")
       }
       for i, word := range words {
         words[i] = str.Reverse(word)
       }
-      return data
+      return interface{}(words)
     },
   })
 
-  cli.Commands = append(cli.Commands, piper.Command{
+  cli.RegisterCommand(piper.Command{
     Name:        "print",
     Description: "print whatever is in the pipeline",
     Args:        []string{"times"},
-    Task: func(data *interface{}, flags map[string]piper.Flag, args []string) *interface{} {
-      deref := *data
-      words := deref.([]string)
+    Task: func(data interface{}, flags map[string]piper.Flag, args []string) interface{} {
+      words := data.([]string)
       times, err := strconv.ParseInt(args[0], 0, 64)
       if err != nil {
         fmt.Println("Error: invalid argument for print")
