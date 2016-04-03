@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-type Task func(interface{}, map[string]Flag, []string) interface{}
+type Task func(interface{}, map[string]Flag, []string) (interface{}, error)
 
 type Flag struct {
 	Name        string
@@ -37,9 +37,7 @@ func (c *CLIApp) PrintHelp() {
 	fmt.Print("\n* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n")
 	fmt.Print("\n" + c.Name + " - " + c.Description + "\n\n")
 	fmt.Println("Usage:")
-	fmt.Println(
-		"   "+c.Name+" [global options] ",
-		"[command [command options] [arguments...] ...]")
+	fmt.Println("   " + c.Name + " [global options] [command [arguments...] ...]")
 	fmt.Print("\n")
 	if len(c.Flags) > 0 {
 		fmt.Println("Global options:")
@@ -86,7 +84,7 @@ func (c *CLIApp) RegisterFlag(flag Flag) {
 // Once the arguments have been interpreted it executes the pipline.
 func (c *CLIApp) Run() (err error) {
 	flags := make(map[string]Flag)
-	pipeline := make([]func(interface{}) interface{}, 0)
+	pipeline := make([]func(interface{}) (interface{}, error), 0)
 	i := 1
 	for i < len(os.Args) {
 		// skip whitespace
@@ -117,9 +115,9 @@ func (c *CLIApp) Run() (err error) {
 							return
 						}
 						task_args := args[1 : len(t.Args)+1]
-						pipeline = append(pipeline, func(data interface{}) interface{} {
-							data = t.Task(data, flags, task_args)
-							return data
+						pipeline = append(pipeline, func(data interface{}) (interface{}, error) {
+							data, err = t.Task(data, flags, task_args)
+							return data, err
 						})
 						read = len(t.Args) + 1
 						return
@@ -141,8 +139,12 @@ func (c *CLIApp) Run() (err error) {
 	}
 
 	var data interface{}
-	for _, stage := range pipeline {
-		data = stage(data)
+	for i, stage := range pipeline {
+		data, err = stage(data)
+		if err != nil {
+			fmt.Println("Error returned from pipeline stage "+strconv.Itoa(i)+" : ",
+				err.Error())
+		}
 	}
 	return
 }
