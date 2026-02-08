@@ -120,7 +120,7 @@ func main() {
 
 ### Invoking your command line interface:
 
-```bash
+```console
 $ pipedream -v start Hello world! upper print 3 lower print 1
  - creating some data for the pipeline with those two words
  - uppercasing those words
