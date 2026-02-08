@@ -1,6 +1,6 @@
-// piper is a CLI framework that does just what I want.
-// It Manages a CLI for pipeline processes, where any number of defined tasks
-// can be specified in sequence.
+// Package piper provides a lightweight CLI framework for building command-line
+// tools with pipeline-based task execution. Multiple commands can be chained
+// in sequence, with each command's output passed as input to the next.
 package piper
 
 import (
