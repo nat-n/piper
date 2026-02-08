@@ -1,7 +1,7 @@
 piper
 =====
 
-A simple and to the point CLI framework in go. The point being to allow
+A simple and to the point CLI framework in Go. The point being to allow
 pipelining of commands like I needed that one time. Also generates help.
 
 Installation
