@@ -24,11 +24,11 @@ func main() {
 		Name:        "start",
 		Description: "takes two words",
 		Args:        []string{"first word", "second word"},
-		Task: func(data interface{}, flags map[string]piper.Flag, args []string) (interface{}, error) {
+		Task: func(data any, flags map[string]piper.Flag, args []string) (any, error) {
 			if _, verbose := flags["verbose"]; verbose {
 				fmt.Println(" - creating some data for the pipeline with those two words")
 			}
-			new_data := (interface{})(args)
+			new_data := (any)(args)
 			return new_data, nil
 		},
 	})
@@ -36,7 +36,7 @@ func main() {
 	cli.RegisterCommand(piper.Command{
 		Name:        "upper",
 		Description: "uppercase all the words",
-		Task: func(data interface{}, flags map[string]piper.Flag, args []string) (interface{}, error) {
+		Task: func(data any, flags map[string]piper.Flag, args []string) (any, error) {
 			words := data.([]string)
 			if _, verbose := flags["verbose"]; verbose {
 				fmt.Println(" - uppercasing those words")
@@ -44,14 +44,14 @@ func main() {
 			for i, word := range words {
 				words[i] = strings.ToUpper(word)
 			}
-			return interface{}(words), nil
+			return any(words), nil
 		},
 	})
 
 	cli.RegisterCommand(piper.Command{
 		Name:        "lower",
 		Description: "lowercase all the words",
-		Task: func(data interface{}, flags map[string]piper.Flag, args []string) (interface{}, error) {
+		Task: func(data any, flags map[string]piper.Flag, args []string) (any, error) {
 			words := data.([]string)
 			if _, verbose := flags["verbose"]; verbose {
 				fmt.Println(" - lowercasing those words")
@@ -59,7 +59,7 @@ func main() {
 			for i, word := range words {
 				words[i] = strings.ToLower(word)
 			}
-			return interface{}(words), nil
+			return any(words), nil
 		},
 	})
 
@@ -67,7 +67,7 @@ func main() {
 		Name:        "print",
 		Description: "print whatever is in the pipeline",
 		Args:        []string{"times"},
-		Task: func(data interface{}, flags map[string]piper.Flag, args []string) (interface{}, error) {
+		Task: func(data any, flags map[string]piper.Flag, args []string) (any, error) {
 			words := data.([]string)
 			times, err := strconv.ParseInt(args[0], 0, 64)
 			if err != nil {

@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-type Task func(interface{}, map[string]Flag, []string) (interface{}, error)
+type Task func(any, map[string]Flag, []string) (any, error)
 
 type Flag struct {
 	Name        string
@@ -82,7 +82,7 @@ func (c *CLIApp) RegisterFlag(flag Flag) {
 // Once the arguments have been interpreted it executes the pipeline.
 func (c *CLIApp) Run() (err error) {
 	flags := make(map[string]Flag)
-	pipeline := make([]func(interface{}) (interface{}, error), 0)
+	pipeline := make([]func(any) (any, error), 0)
 	i := 1
 	for i < len(os.Args) {
 		// skip whitespace
@@ -113,7 +113,7 @@ func (c *CLIApp) Run() (err error) {
 							return
 						}
 						task_args := args[1 : len(t.Args)+1]
-						pipeline = append(pipeline, func(data interface{}) (interface{}, error) {
+						pipeline = append(pipeline, func(data any) (any, error) {
 							data, err = t.Task(data, flags, task_args)
 							return data, err
 						})
@@ -136,7 +136,7 @@ func (c *CLIApp) Run() (err error) {
 		c.PrintHelp()
 	}
 
-	var data interface{}
+	var data any
 	for i, stage := range pipeline {
 		data, err = stage(data)
 		if err != nil {
